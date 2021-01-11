@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+import os
 import requests
 from bs4 import BeautifulSoup
+
+paper_path = "papers"
 
 def scrape_federal_page(url):
     '''
@@ -9,6 +12,9 @@ def scrape_federal_page(url):
     Pages are assumed to match LoC format as of 2021 01 01.
     Each Federalist Paper at the URL will be saved to it's own file in a ./papers directory.
     '''
+    if not os.path.exists(paper_path):
+        os.makedirs(paper_path)
+
     # fetch
     page = requests.get(url)
     
@@ -18,20 +24,20 @@ def scrape_federal_page(url):
     # paper contents are in <div id="s-lg-content-#######" class="  clearfix">
     # paper contents are the first s-lg-content div after the title
     
-    # TODO: parse, write to files
     soup = BeautifulSoup(page.content, 'html.parser')
-    papers = results.find_all('section', class_='s-lib-box s-lib-box-std')
+    papers = soup.findAll("div", {"class": "s-lib-box s-lib-box-std"})
     
     files = []
     for paper in papers:
-        title = paper.find('section', class_='s-lib-box-title').text
-        if title == "Table of Contents":
+        print(paper)
+        title = paper.find("h2", {"class": "s-lib-box-title"}).text
+        title = "".join(title.split())
+        print(title)
+        if title == "TableofContents":
             continue
-        title.replace(" ", "_")
-        title.replace(".", "")
-        fname = "papers/" + title + ".html"
-        f = open(fname, "w")
-        f.write(paper)
+        fname = paper_path + "/" + title + ".html"
+        f = open(fname, "w+")
+        f.write(paper.text)
         f.close()
         files.append(fname)
     
