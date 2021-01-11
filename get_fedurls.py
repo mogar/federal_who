@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, re
 import requests
 from bs4 import BeautifulSoup
 
@@ -29,13 +29,20 @@ def scrape_federal_page(url):
     
     files = []
     for paper in papers:
-        print(paper)
         title = paper.find("h2", {"class": "s-lib-box-title"}).text
         title = "".join(title.split())
-        print(title)
+
         if title == "TableofContents":
             continue
-        fname = paper_path + "/" + title + ".html"
+
+        author = paper.find(text=re.compile('Author:')).next_element.text
+        author = "".join(author.split())
+
+        ppath = paper_path + "/" + author
+        if not os.path.exists(ppath):
+            os.makedirs(ppath)
+
+        fname = ppath + "/" + title + ".txt"
         f = open(fname, "w+")
         f.write(paper.text)
         f.close()
