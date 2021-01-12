@@ -9,6 +9,8 @@ This repo is my experimentation on figuring out who wrote those questionable Fed
 
 I'm going into this without looking up the results of prior investigations, but at the end I'll compare what I find to them.
 
+See here for a good overview of the Federalist Papers history: https://priceonomics.com/how-statistics-solved-a-175-year-old-mystery-about/
+
 # Pre-Reqs
 
 * python3

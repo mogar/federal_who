@@ -4,13 +4,9 @@ import re
 from pathlib import Path
 from collections import Counter
 import numpy as np
+   
+authors = ['AlexanderHamilton', 'JamesMadison', 'JohnJay']
 
-def strip_html(html_str):
-    '''Remove html tags from a string
-    copied from: '''
-    clean = re.compile('<.*?>')
-    return re.sub(clean, '', text)
-    
 def get_author(paper_str):
     '''
     Get the author of the given Federalist Paper

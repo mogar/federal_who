@@ -35,8 +35,15 @@ def scrape_federal_page(url):
         if title == "TableofContents":
             continue
 
-        author = paper.find(text=re.compile('Author:')).next_element.text
-        author = "".join(author.split())
+        author = paper.find(text=re.compile('Author:')).parent.text
+        print(author)
+
+        if " or " in author:
+            author = "unknown"
+        else:
+            author = "".join(author.split())
+            author = author.replace('Author:', '')
+
 
         ppath = paper_path + "/" + author
         if not os.path.exists(ppath):
