@@ -4,55 +4,121 @@ import re
 from pathlib import Path
 from collections import Counter
 import numpy as np
-   
+
+from scipy.sparse import dok_matrix
+
 authors = ['AlexanderHamilton', 'JamesMadison', 'JohnJay']
 
-def get_author(paper_str):
-    '''
-    Get the author of the given Federalist Paper
-    Assumed to be stored in the string with the format: <p>Author: <strong>author_name</strong></p>
-    returns "?" if the author is unknown
-    '''
-    return ""
+def clean_text(paper):
+    paper = paper.lower()
+    paper = paper.replace('\n',' ')
+    paper = paper.replace('\t',' ')
+    paper = paper.replace('“', ' " ')
+    paper = paper.replace('”', ' " ')
+    for spaced in ['.','-',',','!','?','(','—',')']:
+        paper = paper.replace(spaced, ' {0} '.format(spaced))
+    return paper
+
+k = 2 # markov history: next word is based on k prior words
     
 def markov_compare():
-    '''Run Baye's rule word by work on a Markov Chain for each author'''
+    '''Create Markov chains for each author, then do word-wise Bayesian updating on the unkown texts'''
     # set up our tracking variables
-    author_model = {} # joy, madison, hamilton Markov chains
-    unknown_paper = [] # dict from paper num to Markov chain
+    author_markovs = {}
     
     # iterate through all Federalist Papers files
-    # file iteration copied from: https://stackoverflow.com/questions/10377998/how-can-i-iterate-over-files-in-a-given-directory
-    pathlist = Path(directory_in_str).glob('./papers/*.html')
-    for path in pathlist:
+    for author in authors:
+        corpus = ""
+        pathlist = Path('./papers/' + author).glob('*.txt')
+        for path in pathlist:
+            # because path is object not string
+            fpath = str(path)
+            
+            f = open(fpath, "r")
+            paper = f.read()
+            f.close()
+
+            # clean up the string
+            paper = " ".join(paper.split("\n")[11:]) # first 11 lines are metadata
+            paper = clean_text(paper)
+
+            corpus += paper
+
+        # we have all their text, now train the markov chain
+        # using this link as guidance: https://www.kdnuggets.com/2019/11/markov-chains-train-text-generation.html
+        corpus_words = corpus.split(' ')
+        corpus_words= [word for word in corpus_words if word != '']
+        sets_of_k_words = [ ' '.join(corpus_words[i:k]) for i, _ in enumerate(corpus_words[:-k])]
+
+        sets_count = len(list(set(sets_of_k_words)))
+        distinct_words = list(set(corpus_words))
+        next_after_k_words_matrix = dok_matrix((sets_count, len(distinct_words)))
+        distinct_sets_of_k_words = list(set(sets_of_k_words))
+        k_words_idx_dict = {word: i for i, word in enumerate(distinct_sets_of_k_words)}
+        word_idx_dict = {word: i for i, word in enumerate(distinct_words)}
+        for i, word in enumerate(sets_of_k_words[:-k]):
+            word_sequence_idx = k_words_idx_dict[word]
+            next_word_idx = word_idx_dict[corpus_words[i+k]]
+            next_after_k_words_matrix[word_sequence_idx, next_word_idx] +=1
+
+        # we now have our matrix, but we need to normalize it
+        for word_sequence in sets_of_k_words[:-k]:
+            next_word_vector = next_after_k_words_matrix[k_words_idx_dict[word_sequence]]
+            next_after_k_words_matrix[k_words_idx_dict[word_sequence]] = next_word_vector/next_word_vector.sum()
+        epsilon = .001*next_after_k_words_matrix.min() # TODO: Fix this
+
+        # TODO: what parts of this to keep for the author?
+        # add this to correct hist in author_hists
+        author_markovs[author] = (word_idx_dict, k_words_idx_dict, next_after_k_words_matrix, epsilon)
+
+
+
+    unknown_list = Path('./papers/unknown/').glob('*.txt')          
+    for path in unknown_list:
         # because path is object not string
         fpath = str(path)
-         
+        print("file: " + fpath)
+            
         f = open(fpath, "r")
         paper = f.read()
         f.close()
-         
-        author = get_author(paper)
-        
-        if author == "?":
-            # not sure who wrote it, so add it to our questionable list
-            unknown_paper.add(path)
-        else:
-            # add this to correct author model 
-            if author in author_hists:
-               author_model[author].
-            else:
-                author_model[author] = 
-                  
-    # do bayesian updating w markov model
-    for paper in unknown_paper:
-        f = open(paper, "r")
-        paper = f.read()
-        f.close()
-        
-        # TODO: Bayes' rule on chain updates
-        
-        # TODO: print results
+
+        # clean up the string
+        paper = " ".join(paper.split("\n")[11:]) # first 11 lines are metadata
+        paper = clean_text(paper)
+
+        # get our prior        
+        for author in authors:
+            P[author] = 1.0/len(authors)
+
+        # now we use Bayes rule to sequentially update our (uniform) prior on authors, word by word
+        for i in range(len(paper) - k):
+            word_sequence = paper[i:i+k-1]
+            next_word = paper[i+k]
+
+            Pb = 0
+            for author in authors:
+                Pba = 0
+                word_idx_dict = author_markovs[author][0]
+                if next_word in word_idx_dict:
+                    k_words_idx_dict = author_markovs[author][1]
+                    next_after_k_words_matrix = author_markovs[author][2]
+                    next_word_vector = next_after_k_words_matrix[k_words_idx_dict[word_sequence]]
+                    p_idx = word_idx_dict.index[next_word]
+                    Pba = next_word_vector[p_idx]
+                if Pba == 0:
+                    Pba = author_markovs[author][3] # epsilon
+                P[author] = Pba * P[author]
+                # track normalization constant
+                Pb += Pba
+
+            # normalize
+            for author in authors:
+                P[author] /= Pb
+
+        for author in authors:
+            print("* " + author + ": " + P[author])
+
         
 if __name__ == "__main__":
     print("# Markov inverse probability")
