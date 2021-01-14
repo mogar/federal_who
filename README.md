@@ -16,6 +16,7 @@ See here for a good overview of the Federalist Papers history: https://priceonom
 * python3
 * requests
 * Beautiful Soup
+* scipy
 
 # Usage
 

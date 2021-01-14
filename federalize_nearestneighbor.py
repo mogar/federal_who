@@ -11,8 +11,8 @@ authors = ['AlexanderHamilton', 'JamesMadison', 'JohnJay']
 def hist_nearest_neighbor():
     '''Find nearest histogram neighbor for unknown papers'''
     # set up our tracking variables
-    author_hists = {} #TODO: joy, madison, hamilton hists (maybe see numpy or something?)
-    unknown_hists = {} # TODO: dict from paper num to histogram
+    author_hists = {}
+    unknown_hists = {}
     
     # iterate through all Federalist Papers files
     for author in authors:
