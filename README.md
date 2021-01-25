@@ -25,6 +25,57 @@ cd federal_who
 ./get_fedurls.py # get all the federalist papers from the Library of Congress
 ./federalyze.py # perform analysis and print results
 
+
+## Federalize Markov
+
+
+file: papers/unknown/FederalistNo.49.txt
+* AlexanderHamilton: 9.443617638347116e-111
+* JamesMadison: 1.0
+* JohnJay: 0.0
+file: papers/unknown/FederalistNo.50.txt
+* AlexanderHamilton: 1.8727134398441352e-33
+* JamesMadison: 1.0
+* JohnJay: 5.256240469342864e-29
+file: papers/unknown/FederalistNo.51.txt
+* AlexanderHamilton: 1.8955210608118475e-228
+* JamesMadison: 1.0
+* JohnJay: 0.0
+file: papers/unknown/FederalistNo.52.txt
+* AlexanderHamilton: 4.661556287831538e-40
+* JamesMadison: 1.0
+* JohnJay: 0.0
+file: papers/unknown/FederalistNo.53.txt
+* AlexanderHamilton: 7.135449665091098e-154
+* JamesMadison: 1.0
+* JohnJay: 7.054953147582555e-186
+file: papers/unknown/FederalistNo.54.txt
+* AlexanderHamilton: 0.0
+* JamesMadison: 1.0
+* JohnJay: 0.0
+file: papers/unknown/FederalistNo.55.txt
+* AlexanderHamilton: 1.0
+* JamesMadison: 4.68672501230136e-41
+* JohnJay: 6.88158342129063e-158
+file: papers/unknown/FederalistNo.56.txt
+* AlexanderHamilton: 1.0
+* JamesMadison: 1.9559503215634695e-153
+* JohnJay: 0.0
+file: papers/unknown/FederalistNo.57.txt
+* AlexanderHamilton: 1.0
+* JamesMadison: 4.672316591574561e-39
+* JohnJay: 4.844247997608867e-204
+file: papers/unknown/FederalistNo.62.txt
+* AlexanderHamilton: 6.883091011385395e-209
+* JamesMadison: 1.0
+* JohnJay: 2.942184949009688e-20
+file: papers/unknown/FederalistNo.63.txt
+* AlexanderHamilton: 4.945100607575191e-285
+* JamesMadison: 1.0
+* JohnJay: 3.5034436013929836e-208
+
+
+
 # Analysis Methods and Results
 
 Ideas:
